@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Disease Detection - AI Smart Farming Assistant</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+
+            background:
+                linear-gradient(
+                    rgba(220, 240, 220, 0.75),
+                    rgba(220, 240, 220, 0.75)
+                ),
+                url("/static/images/farm.jpg");
+
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+
+            min-height: 100vh;
+        }
+
+
+        /* NAVBAR */
+
+        .navbar-custom {
+            background: linear-gradient(
+                90deg,
+                #dff5b5,
+                #fff7d6
+            );
+
+            padding: 12px 8%;
+        }
+
+
+        .brand {
+            font-size: 22px;
+            font-weight: bold;
+            color: #16834d;
+            text-decoration: none;
+        }
+
+
+        .brand:hover {
+            color: #16834d;
+        }
+
+
+        .language-buttons button {
+            margin-left: 5px;
+        }
+
+
+        /* MAIN */
+
+        .main-container {
+            width: 70%;
+            margin: 55px auto;
+        }
+
+
+        .disease-card {
+            background: white;
+            border-radius: 22px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 10px 25px rgba(0,0,0,0.15);
+        }
+
+
+        .card-header-custom {
+            background: #198754;
+            color: white;
+
+            text-align: center;
+
+            padding: 25px;
+        }
+
+
+        .card-header-custom h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+
+        .card-header-custom p {
+            margin-top: 10px;
+            margin-bottom: 0;
+
+            font-size: 17px;
+        }
+
+
+        /* UPLOAD AREA */
+
+        .upload-section {
+            padding: 35px;
+        }
+
+
+        .upload-box {
+            border: 2px dashed #58a96b;
+
+            border-radius: 12px;
+
+            padding: 30px;
+
+            text-align: center;
+
+            background: #f7fff8;
+        }
+
+
+        .upload-box h4 {
+            color: #198754;
+
+            margin-bottom: 10px;
+        }
+
+
+        .file-input {
+            margin-top: 20px;
+        }
+
+
+        .detect-button {
+            margin-top: 20px;
+
+            width: 100%;
+
+            padding: 12px;
+
+            font-size: 18px;
+
+            font-weight: bold;
+        }
+
+
+        /* SUCCESS */
+
+        .success-message {
+            background: #d1e7dd;
+
+            color: #0f5132;
+
+            padding: 12px;
+
+            border-radius: 8px;
+
+            text-align: center;
+
+            margin-top: 15px;
+
+            display: none;
+        }
+
+
+        /* ERROR */
+
+        .error-message {
+            background: #f8d7da;
+
+            color: #842029;
+
+            padding: 12px;
+
+            border-radius: 8px;
+
+            text-align: center;
+
+            margin: 20px 35px;
+        }
+
+
+        /* RESULT */
+
+        .result-section {
+            margin: 0 35px 35px 35px;
+
+            background: #f1f8e9;
+
+            border-left: 6px solid #198754;
+
+            border-radius: 10px;
+
+            padding: 25px;
+        }
+
+
+        .result-title {
+            color: #198754;
+
+            font-weight: bold;
+
+            margin-bottom: 20px;
+        }
+
+
+        .result-item {
+            background: white;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            margin-bottom: 12px;
+        }
+
+
+        .result-label {
+            font-weight: bold;
+
+            color: #198754;
+
+            display: block;
+
+            margin-bottom: 5px;
+        }
+
+
+        .result-value {
+            color: #333;
+
+            line-height: 1.6;
+        }
+
+
+        /* FOOTER */
+
+        footer {
+            background: #0b5d0b;
+
+            color: white;
+
+            text-align: center;
+
+            padding: 25px 10px;
+
+            margin-top: 50px;
+        }
+
+
+        footer h4 {
+            margin-bottom: 10px;
+        }
+
+
+        footer p {
+            margin: 7px;
+        }
+
+
+        /* MOBILE */
+
+        @media(max-width: 768px) {
+
+            .main-container {
+                width: 92%;
+            }
+
+            .card-header-custom h1 {
+                font-size: 26px;
+            }
+
+            .upload-section {
+                padding: 20px;
+            }
+
+            .result-section {
+                margin: 0 20px 20px 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar-custom">
+
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+
+        <a href="/dashboard" class="brand">
+
+            🌾 <span id="brandText">
+                AI Smart Farming Assistant
+            </span>
+
+        </a>
+
+
+        <div class="language-buttons">
+
+            <button
+                type="button"
+                id="englishBtn"
+                class="btn btn-success"
+                onclick="changeLanguage('en')">
+
+                English
+
+            </button>
+
+
+            <button
+                type="button"
+                id="marathiBtn"
+                class="btn btn-outline-success"
+                onclick="changeLanguage('mr')">
+
+                मराठी
+
+            </button>
+
+
+            <a
+                href="/dashboard"
+                class="btn btn-outline-success">
+
+                Dashboard
+
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+
+<!-- ================= MAIN ================= -->
+
+<div class="main-container">
+
+
+    <div class="disease-card">
+
+
+        <!-- HEADER -->
+
+        <div class="card-header-custom">
+
+            <h1 id="pageTitle">
+
+                🌿 Disease Detection
+
+            </h1>
+
+
+            <p id="pageSubtitle">
+
+                Upload a plant or leaf image and let AI analyze it.
+
+            </p>
+
+        </div>
+
+
+
+        <!-- UPLOAD -->
+
+        <div class="upload-section">
+
+
+            <form
+                action="/predict"
+                method="POST"
+                enctype="multipart/form-data">
+
+
+                <!-- IMPORTANT: Language -->
+
+                <input
+                    type="hidden"
+                    name="language"
+                    id="selectedLanguage"
+                    value="en"
+                >
+
+
+                <div class="upload-box">
+
+
+                    <h4 id="uploadTitle">
+
+                        Upload Plant / Leaf Image
+
+                    </h4>
+
+
+                    <p id="uploadDescription">
+
+                        Select a clear image of the plant leaf for better analysis.
+
+                    </p>
+
+
+                    <input
+                        type="file"
+                        name="leaf_image"
+                        id="leafImage"
+                        class="form-control file-input"
+                        accept="image/*"
+                        required
+                    >
+
+
+                    <!-- SUCCESS MESSAGE -->
+
+                    <div
+                        id="imageMessage"
+                        class="success-message">
+
+                        Image received successfully!
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- BUTTON -->
+
+                <button
+                    type="submit"
+                    class="btn btn-success detect-button"
+                    id="detectButton">
+
+                    🔍 Detect Disease
+
+                </button>
+
+
+            </form>
+
+        </div>
+
+
+
+        <!-- ================= ERROR ================= -->
+
+        {% if error %}
+
+        <div class="error-message">
+
+            ⚠️ {{ error }}
+
+        </div>
+
+        {% endif %}
+
+
+
+        <!-- ================= RESULT ================= -->
+
+        {% if result %}
+
+        <div class="result-section">
+
+
+            <h3
+                class="result-title"
+                id="resultTitle">
+
+                🌱 AI Disease Detection Result
+
+            </h3>
+
+
+
+            <!-- PLANT -->
+
+            <div class="result-item">
+
+                <span
+                    class="result-label"
+                    id="plantLabel">
+
+                    Plant
+
+                </span>
+
+
+                <div class="result-value">
+
+                    {{ crop }}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- DISEASE -->
+
+            <div class="result-item">
+
+                <span
+                    class="result-label"
+                    id="diseaseLabel">
+
+                    Possible Disease
+
+                </span>
+
+
+                <div class="result-value">
+
+                    {{ result }}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- SYMPTOMS -->
+
+            <div class="result-item">
+
+                <span
+                    class="result-label"
+                    id="symptomsLabel">
+
+                    Symptoms
+
+                </span>
+
+
+                <div class="result-value">
+
+                    {{ symptoms }}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- CAUSE -->
+
+            <div class="result-item">
+
+                <span
+                    class="result-label"
+                    id="causeLabel">
+
+                    Cause
+
+                </span>
+
+
+                <div class="result-value">
+
+                    {{ cause }}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- TREATMENT -->
+
+            <div class="result-item">
+
+                <span
+                    class="result-label"
+                    id="treatmentLabel">
+
+                    Treatment
+
+                </span>
+
+
+                <div class="result-value">
+
+                    {{ treatment }}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PREVENTION -->
+
+            <div class="result-item">
+
+                <span
+                    class="result-label"
+                    id="preventionLabel">
+
+                    Prevention
+
+                </span>
+
+
+                <div class="result-value">
+
+                    {{ prevention }}
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+
+    <h4 id="contactTitle">
+
+        Contact Us
+
+    </h4>
+
+
+    <p id="contactText">
+
+        📞 +91 98765 43210
+
+    </p>
+
+
+    <p>
+
+        © 2026 AI Smart Farming Assistant |
+        Smart Technology for Better Farming
+
+    </p>
+
+
+</footer>
+
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+
+/* ================= LANGUAGE TEXT ================= */
+
+const languageText = {
+
+    en: {
+
+        brand:
+            "AI Smart Farming Assistant",
+
+        title:
+            "🌿 Disease Detection",
+
+        subtitle:
+            "Upload a plant or leaf image and let AI analyze it.",
+
+        uploadTitle:
+            "Upload Plant / Leaf Image",
+
+        uploadDescription:
+            "Select a clear image of the plant leaf for better analysis.",
+
+        imageReceived:
+            "Image received successfully!",
+
+        detect:
+            "🔍 Detect Disease",
+
+        result:
+            "🌱 AI Disease Detection Result",
+
+        plant:
+            "Plant",
+
+        disease:
+            "Possible Disease",
+
+        symptoms:
+            "Symptoms",
+
+        cause:
+            "Cause",
+
+        treatment:
+            "Treatment",
+
+        prevention:
+            "Prevention",
+
+        contact:
+            "Contact Us"
+
+    },
+
+
+    mr: {
+
+        brand:
+            "AI स्मार्ट फार्मिंग असिस्टंट",
+
+        title:
+            "🌿 वनस्पती रोग ओळख",
+
+        subtitle:
+            "पिकाच्या किंवा पानाच्या फोटोवरून AI च्या मदतीने रोगाचे विश्लेषण करा.",
+
+        uploadTitle:
+            "पिकाचा / पानाचा फोटो अपलोड करा",
+
+        uploadDescription:
+            "चांगल्या विश्लेषणासाठी पानाचा स्पष्ट फोटो निवडा.",
+
+        imageReceived:
+            "फोटो यशस्वीरित्या प्राप्त झाला!",
+
+        detect:
+            "🔍 रोग ओळखा",
+
+        result:
+            "🌱 AI रोग ओळख परिणाम",
+
+        plant:
+            "पीक",
+
+        disease:
+            "संभाव्य रोग",
+
+        symptoms:
+            "लक्षणे",
+
+        cause:
+            "कारण",
+
+        treatment:
+            "उपचार",
+
+        prevention:
+            "प्रतिबंध",
+
+        contact:
+            "संपर्क करा"
+
+    }
+
+};
+
+
+
+/* ================= CHANGE LANGUAGE ================= */
+
+function changeLanguage(language) {
+
+
+    localStorage.setItem(
+        "diseaseLanguage",
+        language
+    );
+
+
+    document.getElementById(
+        "selectedLanguage"
+    ).value = language;
+
+
+    const text =
+        languageText[language];
+
+
+    document.getElementById(
+        "brandText"
+    ).innerText = text.brand;
+
+
+    document.getElementById(
+        "pageTitle"
+    ).innerText = text.title;
+
+
+    document.getElementById(
+        "pageSubtitle"
+    ).innerText = text.subtitle;
+
+
+    document.getElementById(
+        "uploadTitle"
+    ).innerText = text.uploadTitle;
+
+
+    document.getElementById(
+        "uploadDescription"
+    ).innerText = text.uploadDescription;
+
+
+    document.getElementById(
+        "detectButton"
+    ).innerText = text.detect;
+
+
+    document.getElementById(
+        "contactTitle"
+    ).innerText = text.contact;
+
+
+    /* Result labels */
+
+    if (document.getElementById("resultTitle")) {
+
+        document.getElementById(
+            "resultTitle"
+        ).innerText = text.result;
+
+
+        document.getElementById(
+            "plantLabel"
+        ).innerText = text.plant;
+
+
+        document.getElementById(
+            "diseaseLabel"
+        ).innerText = text.disease;
+
+
+        document.getElementById(
+            "symptomsLabel"
+        ).innerText = text.symptoms;
+
+
+        document.getElementById(
+            "causeLabel"
+        ).innerText = text.cause;
+
+
+        document.getElementById(
+            "treatmentLabel"
+        ).innerText = text.treatment;
+
+
+        document.getElementById(
+            "preventionLabel"
+        ).innerText = text.prevention;
+
+    }
+
+
+    /* Button design */
+
+    if (language === "en") {
+
+        document.getElementById(
+            "englishBtn"
+        ).className =
+            "btn btn-success";
+
+
+        document.getElementById(
+            "marathiBtn"
+        ).className =
+            "btn btn-outline-success";
+
+    }
+
+    else {
+
+        document.getElementById(
+            "englishBtn"
+        ).className =
+            "btn btn-outline-success";
+
+
+        document.getElementById(
+            "marathiBtn"
+        ).className =
+            "btn btn-success";
+
+    }
+
+}
+
+
+
+/* ================= IMAGE MESSAGE ================= */
+
+document.getElementById(
+    "leafImage"
+).addEventListener(
+    "change",
+    function() {
+
+        const message =
+            document.getElementById(
+                "imageMessage"
+            );
+
+
+        if (this.files.length > 0) {
+
+            const language =
+                localStorage.getItem(
+                    "diseaseLanguage"
+                ) || "en";
+
+
+            message.innerText =
+                languageText[
+                    language
+                ].imageReceived;
+
+
+            message.style.display =
+                "block";
+
+        }
+
+        else {
+
+            message.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+
+/* ================= PAGE LOAD ================= */
+
+window.onload = function() {
+
+    const language =
+        localStorage.getItem(
+            "diseaseLanguage"
+        ) || "en";
+
+
+    changeLanguage(language);
+
+};
+
+
+</script>
+
+
+</body>
+
+</html>

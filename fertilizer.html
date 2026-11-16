@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fertilizer Recommendation - AI Smart Farming Assistant</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <style>
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+
+            background:
+                linear-gradient(
+                    rgba(0, 80, 0, 0.45),
+                    rgba(0, 80, 0, 0.45)
+                ),
+                url("/static/images/farm.jpg");
+
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .navbar {
+            background: linear-gradient(
+                90deg,
+                #dff5b0,
+                #fff3a6
+            );
+
+            padding: 12px 25px;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #176b2c !important;
+            font-size: 21px;
+        }
+
+        .navbar a {
+            color: #176b2c;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .language-btn {
+            border: none;
+            background: #198754;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            margin-left: 5px;
+        }
+
+        .language-btn:hover {
+            background: #146c43;
+        }
+
+        .main-container {
+            max-width: 850px;
+            margin: 45px auto;
+            padding: 20px;
+        }
+
+        .fertilizer-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+        }
+
+        .page-title {
+            text-align: center;
+            color: #176b2c;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .page-description {
+            text-align: center;
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            font-weight: bold;
+            color: #176b2c;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            padding: 11px;
+        }
+
+        .recommend-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        #resultSection {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .result-box {
+            background: #f5fff5;
+            border-left: 5px solid #198754;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .result-box h5 {
+            color: #176b2c;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .result-box p {
+            margin: 0;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            color: #176b2c;
+            font-weight: bold;
+        }
+
+        .error-message {
+            display: none;
+            margin-top: 20px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar">
+
+    <div class="container-fluid">
+
+        <a class="navbar-brand" href="/dashboard">
+            🌾 AI Smart Farming Assistant
+        </a>
+
+        <div>
+
+            <a href="/dashboard" class="me-3" id="dashboardLink">
+                Dashboard
+            </a>
+
+            <button
+                class="language-btn"
+                onclick="setLanguage('en')">
+                English
+            </button>
+
+            <button
+                class="language-btn"
+                onclick="setLanguage('mr')">
+                मराठी
+            </button>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<!-- ================= MAIN ================= -->
+
+<div class="main-container">
+
+    <div class="fertilizer-card">
+
+        <h2 class="page-title" id="pageTitle">
+            🧪 Fertilizer Recommendation
+        </h2>
+
+        <p class="page-description" id="pageDescription">
+            Select the crop and growth stage to get the suitable fertilizer and quantity.
+        </p>
+
+
+        <!-- CROP -->
+
+        <div class="mb-3">
+
+            <label
+                for="crop"
+                class="form-label"
+                id="cropLabel">
+
+                🌱 Crop
+
+            </label>
+
+            <input
+                type="text"
+                id="crop"
+                class="form-control"
+                placeholder="Enter crop name">
+
+        </div>
+
+
+        <!-- GROWTH STAGE -->
+
+        <div class="mb-3">
+
+            <label
+                for="stage"
+                class="form-label"
+                id="stageLabel">
+
+                🌿 Growth Stage
+
+            </label>
+
+            <select
+                id="stage"
+                class="form-select">
+
+                <option value="">
+                    Select Growth Stage
+                </option>
+
+                <option value="Initial">
+                    Initial / सुरुवातीची अवस्था
+                </option>
+
+                <option value="Vegetative">
+                    Vegetative / वाढीची अवस्था
+                </option>
+
+                <option value="Flowering">
+                    Flowering / फुलोरा अवस्था
+                </option>
+
+                <option value="Maturity">
+                    Maturity / परिपक्व अवस्था
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- CITY -->
+
+        <div class="mb-3">
+
+            <label
+                for="city"
+                class="form-label"
+                id="cityLabel">
+
+                📍 City
+
+            </label>
+
+            <input
+                type="text"
+                id="city"
+                class="form-control"
+                placeholder="Enter city name">
+
+        </div>
+
+
+        <!-- BUTTON -->
+
+        <button
+            class="btn btn-success recommend-btn"
+            onclick="getFertilizerRecommendation()"
+            id="recommendButton">
+
+            🧪 Get Fertilizer Recommendation
+
+        </button>
+
+
+        <!-- LOADING -->
+
+        <div
+            class="loading"
+            id="loading">
+
+            ⏳ Getting live weather and AI fertilizer recommendation...
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div
+            class="alert alert-danger error-message"
+            id="errorMessage">
+
+        </div>
+
+
+        <!-- ================= RESULT ================= -->
+
+        <div id="resultSection">
+
+            <h3
+                class="text-center mb-4"
+                style="color:#176b2c;"
+                id="resultTitle">
+
+                🧪 Fertilizer Recommendation
+
+            </h3>
+
+
+            <!-- WEATHER -->
+
+            <div class="result-box">
+
+                <h5 id="weatherTitle">
+                    🌦️ Live Weather
+                </h5>
+
+                <p id="weatherResult"></p>
+
+            </div>
+
+
+            <!-- FERTILIZER -->
+
+            <div class="result-box">
+
+                <h5 id="fertilizerTitle">
+                    🧪 Recommended Fertilizer
+                </h5>
+
+                <p id="fertilizerResult"></p>
+
+            </div>
+
+
+            <!-- QUANTITY -->
+
+            <div class="result-box">
+
+                <h5 id="quantityTitle">
+                    ⚖️ Recommended Quantity
+                </h5>
+
+                <p id="quantityResult"></p>
+
+            </div>
+
+
+            <!-- REASON -->
+
+            <div class="result-box">
+
+                <h5 id="reasonTitle">
+                    💡 Reason
+                </h5>
+
+                <p id="reasonResult"></p>
+
+            </div>
+
+
+            <!-- ADVICE -->
+
+            <div class="result-box">
+
+                <h5 id="adviceTitle">
+                    🌾 Farming Advice
+                </h5>
+
+                <p id="adviceResult"></p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    // ==========================================
+    // LANGUAGE
+    // ==========================================
+
+    let selectedLanguage =
+        localStorage.getItem("selectedLanguage") || "en";
+
+
+    const text = {
+
+        en: {
+
+            pageTitle:
+                "🧪 Fertilizer Recommendation",
+
+            pageDescription:
+                "Select the crop and growth stage to get the suitable fertilizer and quantity.",
+
+            crop:
+                "🌱 Crop",
+
+            stage:
+                "🌿 Growth Stage",
+
+            city:
+                "📍 City",
+
+            recommend:
+                "🧪 Get Fertilizer Recommendation",
+
+            result:
+                "🧪 Fertilizer Recommendation",
+
+            weather:
+                "🌦️ Live Weather",
+
+            fertilizer:
+                "🧪 Recommended Fertilizer",
+
+            quantity:
+                "⚖️ Recommended Quantity",
+
+            reason:
+                "💡 Reason",
+
+            advice:
+                "🌾 Farming Advice",
+
+            dashboard:
+                "Dashboard",
+
+            loading:
+                "⏳ Getting live weather and AI fertilizer recommendation..."
+
+        },
+
+
+        mr: {
+
+            pageTitle:
+                "🧪 खत शिफारस",
+
+            pageDescription:
+                "पीक आणि वाढीचा टप्पा निवडल्यानंतर योग्य खत व प्रमाण सुचवले जाईल.",
+
+            crop:
+                "🌱 पीक",
+
+            stage:
+                "🌿 वाढीचा टप्पा",
+
+            city:
+                "📍 शहर",
+
+            recommend:
+                "🧪 खत शिफारस मिळवा",
+
+            result:
+                "🧪 खत शिफारस",
+
+            weather:
+                "🌦️ सध्याचे हवामान",
+
+            fertilizer:
+                "🧪 शिफारस केलेले खत",
+
+            quantity:
+                "⚖️ शिफारस केलेले प्रमाण",
+
+            reason:
+                "💡 कारण",
+
+            advice:
+                "🌾 शेती सल्ला",
+
+            dashboard:
+                "डॅशबोर्ड",
+
+            loading:
+                "⏳ सध्याचे हवामान आणि AI खत शिफारस मिळवत आहे..."
+
+        }
+
+    };
+
+
+    // ==========================================
+    // SET LANGUAGE
+    // ==========================================
+
+    function setLanguage(language) {
+
+        selectedLanguage = language;
+
+        localStorage.setItem(
+            "selectedLanguage",
+            language
+        );
+
+        const t = text[language];
+
+        document.getElementById("pageTitle").innerText =
+            t.pageTitle;
+
+        document.getElementById("pageDescription").innerText =
+            t.pageDescription;
+
+        document.getElementById("cropLabel").innerText =
+            t.crop;
+
+        document.getElementById("stageLabel").innerText =
+            t.stage;
+
+        document.getElementById("cityLabel").innerText =
+            t.city;
+
+        document.getElementById("recommendButton").innerText =
+            t.recommend;
+
+        document.getElementById("resultTitle").innerText =
+            t.result;
+
+        document.getElementById("weatherTitle").innerText =
+            t.weather;
+
+        document.getElementById("fertilizerTitle").innerText =
+            t.fertilizer;
+
+        document.getElementById("quantityTitle").innerText =
+            t.quantity;
+
+        document.getElementById("reasonTitle").innerText =
+            t.reason;
+
+        document.getElementById("adviceTitle").innerText =
+            t.advice;
+
+        document.getElementById("dashboardLink").innerText =
+            t.dashboard;
+
+        document.getElementById("loading").innerText =
+            t.loading;
+
+    }
+
+
+    // ==========================================
+    // GET FERTILIZER RECOMMENDATION
+    // ==========================================
+// ==========================================
+// GET FERTILIZER RECOMMENDATION
+// ==========================================
+
+function getFertilizerRecommendation() {
+
+    const crop = document.getElementById("crop").value.trim();
+    const stage = document.getElementById("stage").value;
+    const city = document.getElementById("city").value.trim();
+
+    // Validation
+    if (!crop || !stage || !city) {
+
+        const message =
+            selectedLanguage === "mr"
+                ? "कृपया पीक, वाढीचा टप्पा आणि शहर निवडा."
+                : "Please enter crop, growth stage and city.";
+
+        alert(message);
+        return;
+    }
+
+    // Show loading
+    document.getElementById("loading").style.display = "block";
+    document.getElementById("resultSection").style.display = "none";
+    document.getElementById("errorMessage").style.display = "none";
+
+    const url =
+        "/fertilizer_recommendation?" +
+        "crop=" + encodeURIComponent(crop) +
+        "&stage=" + encodeURIComponent(stage) +
+        "&city=" + encodeURIComponent(city) +
+        "&language=" + encodeURIComponent(selectedLanguage);
+
+    fetch(url)
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Server Error: " + response.status);
+            }
+
+            return response.json();
+        })
+
+        .then(data => {
+
+            // Hide loading
+            document.getElementById("loading").style.display = "none";
+
+            // Backend error
+            if (data.error) {
+
+                document.getElementById("errorMessage").innerText =
+                    data.error;
+
+                document.getElementById("errorMessage").style.display =
+                    "block";
+
+                return;
+            }
+
+            // Display result
+            document.getElementById("weatherResult").innerText =
+                data.weather || "Weather information not available.";
+
+            document.getElementById("fertilizerResult").innerText =
+                data.fertilizer || "Fertilizer recommendation not available.";
+
+            document.getElementById("quantityResult").innerText =
+                data.quantity || "Quantity information not available.";
+
+            document.getElementById("reasonResult").innerText =
+                data.reason || "Reason not available.";
+
+            document.getElementById("adviceResult").innerText =
+                data.advice || "Farming advice not available.";
+
+            // Show result section
+            document.getElementById("resultSection").style.display =
+                "block";
+        })
+
+        .catch(error => {
+
+            console.error("Fertilizer Error:", error);
+
+            document.getElementById("loading").style.display =
+                "none";
+
+            document.getElementById("errorMessage").innerText =
+                selectedLanguage === "mr"
+                    ? "खत शिफारस मिळवता आली नाही. कृपया पुन्हा प्रयत्न करा."
+                    : "Unable to generate fertilizer recommendation. Please try again.";
+
+            document.getElementById("errorMessage").style.display =
+                "block";
+        });
+
+}
+
+
+// ==========================================
+// LOAD SAVED LANGUAGE
+// ==========================================
+
+setLanguage(selectedLanguage);
+
+</script>
+
+</body>
+
+</html>

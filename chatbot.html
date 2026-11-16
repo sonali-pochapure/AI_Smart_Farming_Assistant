@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Agriculture Chatbot</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        body {
+            background-image: url("{{ url_for('static', filename='images/farm.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .chatbot-section {
+            padding: 40px 15px;
+        }
+
+        .chatbot-card {
+            max-width: 850px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .chat-header h1 {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .language-buttons {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .language-buttons button {
+            margin: 5px;
+            min-width: 120px;
+        }
+
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 15px;
+            margin-bottom: 12px;
+            max-width: 85%;
+            line-height: 1.5;
+        }
+
+        .user-message {
+            background: #198754;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .bot-message {
+            background: #e9f5ee;
+            color: #222;
+            margin-right: auto;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-area textarea {
+            resize: none;
+            height: 55px;
+        }
+
+        .send-button {
+            min-width: 110px;
+        }
+
+        .loading {
+            color: #198754;
+            font-style: italic;
+        }
+
+        footer {
+            margin-top: 30px;
+            padding: 20px;
+            text-align: center;
+            background: rgba(25, 135, 84, 0.95);
+            color: white;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar navbar-expand-lg">
+
+    <div class="container">
+
+        <a class="navbar-brand fw-bold text-success"
+           href="/dashboard">
+
+            <img src="https://png.pngtree.com/png-clipart/20240606/original/pngtree-farmer-logo-png-image_15258161.png"
+                 height="60"
+                 width="60"
+                 class="farmer-logo"
+                 alt="Farmer Logo">
+
+            <span id="brandText">
+                AI Smart Farming Assistant
+            </span>
+
+        </a>
+
+
+        <a href="/dashboard"
+           class="btn btn-success"
+           id="dashboardButton">
+
+            Dashboard
+
+        </a>
+
+    </div>
+
+</nav>
+
+
+
+<!-- ================= CHATBOT ================= -->
+
+<section class="chatbot-section">
+
+    <div class="chatbot-card">
+
+
+        <!-- HEADER -->
+
+        <div class="chat-header">
+
+            <h1 id="chatTitle">
+                🤖 AI Agriculture Chatbot
+            </h1>
+
+            <p class="text-muted"
+               id="chatSubtitle">
+
+                Ask your farming questions and get AI-based answers.
+
+            </p>
+
+        </div>
+
+
+
+        <!-- ================= LANGUAGE BUTTONS ================= -->
+
+        <div class="language-buttons">
+
+            <button type="button"
+                    id="englishButton"
+                    class="btn btn-success">
+
+                English
+
+            </button>
+
+
+            <button type="button"
+                    id="marathiButton"
+                    class="btn btn-outline-success">
+
+                मराठी
+
+            </button>
+
+        </div>
+
+
+
+        <!-- ================= CHAT BOX ================= -->
+
+        <div id="chatBox"
+             class="chat-box">
+
+            <div class="message bot-message">
+
+                <strong id="welcomeName">
+                    🤖 AI Assistant:
+                </strong>
+
+                <br>
+
+                <span id="welcomeMessage">
+
+                    Hello! I am your AI Agriculture Assistant.
+                    Ask me anything about crops, diseases,
+                    fertilizer, irrigation or farming.
+
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= INPUT ================= -->
+
+        <div class="input-area">
+
+            <textarea
+                id="userMessage"
+                class="form-control"
+                placeholder="Type your farming question..."></textarea>
+
+
+            <button
+                id="sendButton"
+                class="btn btn-success send-button">
+
+                Send
+
+            </button>
+
+        </div>
+
+
+        <!-- CLEAR BUTTON -->
+
+        <div class="text-center mt-3">
+
+            <button
+                id="clearButton"
+                class="btn btn-outline-danger">
+
+                Clear Chat
+
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <h5 id="contactTitle">
+        Contact Us
+    </h5>
+
+    <p>
+        📞 +91 98765 43210
+    </p>
+
+    <p>
+
+        <span id="footerText">
+
+            © 2026 AI Smart Farming Assistant |
+            Smart Technology for Better Farming
+
+        </span>
+
+    </p>
+
+</footer>
+
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+
+/* =====================================================
+   LANGUAGE
+===================================================== */
+
+let selectedLanguage =
+    localStorage.getItem("chatbotLanguage") || "English";
+
+
+/* =====================================================
+   PAGE TEXT
+===================================================== */
+
+const text = {
+
+    English: {
+
+        brand:
+            "AI Smart Farming Assistant",
+
+        dashboard:
+            "Dashboard",
+
+        title:
+            "🤖 AI Agriculture Chatbot",
+
+        subtitle:
+            "Ask your farming questions and get AI-based answers.",
+
+        welcomeName:
+            "🤖 AI Assistant:",
+
+        welcome:
+            "Hello! I am your AI Agriculture Assistant. Ask me anything about crops, diseases, fertilizer, irrigation or farming.",
+
+        placeholder:
+            "Type your farming question...",
+
+        send:
+            "Send",
+
+        clear:
+            "Clear Chat",
+
+        contact:
+            "Contact Us",
+
+        footer:
+            "© 2026 AI Smart Farming Assistant | Smart Technology for Better Farming",
+
+        thinking:
+            "🤖 AI is thinking...",
+
+        you:
+            "You:",
+
+        ai:
+            "🤖 AI Assistant:",
+
+        error:
+            "Unable to connect with AI. Please try again.",
+
+        noResponse:
+            "Sorry, I could not generate a response."
+
+    },
+
+
+    Marathi: {
+
+        brand:
+            "AI स्मार्ट फार्मिंग असिस्टंट",
+
+        dashboard:
+            "डॅशबोर्ड",
+
+        title:
+            "🤖 AI कृषी चॅटबॉट",
+
+        subtitle:
+            "तुमचे शेतीविषयक प्रश्न विचारा आणि AI कडून उत्तरे मिळवा.",
+
+        welcomeName:
+            "🤖 AI सहाय्यक:",
+
+        welcome:
+            "नमस्कार! मी तुमचा AI कृषी सहाय्यक आहे. तुम्ही मला पिके, रोग, खत, सिंचन किंवा शेतीविषयी कोणताही प्रश्न विचारू शकता.",
+
+        placeholder:
+            "तुमचा शेतीविषयक प्रश्न येथे लिहा...",
+
+        send:
+            "पाठवा",
+
+        clear:
+            "चॅट साफ करा",
+
+        contact:
+            "आमच्याशी संपर्क साधा",
+
+        footer:
+            "© 2026 AI स्मार्ट फार्मिंग असिस्टंट | चांगल्या शेतीसाठी स्मार्ट तंत्रज्ञान",
+
+        thinking:
+            "🤖 AI विचार करत आहे...",
+
+        you:
+            "तुम्ही:",
+
+        ai:
+            "🤖 AI सहाय्यक:",
+
+        error:
+            "AI शी कनेक्ट होऊ शकले नाही. कृपया पुन्हा प्रयत्न करा.",
+
+        noResponse:
+            "माफ करा, उत्तर तयार करता आले नाही."
+
+    }
+
+};
+
+
+
+/* =====================================================
+   CHANGE LANGUAGE
+===================================================== */
+
+function setLanguage(language) {
+
+    selectedLanguage = language;
+
+    localStorage.setItem(
+        "chatbotLanguage",
+        language
+    );
+
+
+    const t = text[language];
+
+
+    document.getElementById("brandText").innerText =
+        t.brand;
+
+
+    document.getElementById("dashboardButton").innerText =
+        t.dashboard;
+
+
+    document.getElementById("chatTitle").innerText =
+        t.title;
+
+
+    document.getElementById("chatSubtitle").innerText =
+        t.subtitle;
+
+
+    document.getElementById("welcomeName").innerText =
+        t.welcomeName;
+
+
+    document.getElementById("welcomeMessage").innerText =
+        t.welcome;
+
+
+    document.getElementById("userMessage").placeholder =
+        t.placeholder;
+
+
+    document.getElementById("sendButton").innerText =
+        t.send;
+
+
+    document.getElementById("clearButton").innerText =
+        t.clear;
+
+
+    document.getElementById("contactTitle").innerText =
+        t.contact;
+
+
+    document.getElementById("footerText").innerText =
+        t.footer;
+
+
+
+    /* Button design */
+
+    if (language === "Marathi") {
+
+        document.getElementById("marathiButton").className =
+            "btn btn-success";
+
+        document.getElementById("englishButton").className =
+            "btn btn-outline-success";
+
+    }
+
+    else {
+
+        document.getElementById("englishButton").className =
+            "btn btn-success";
+
+        document.getElementById("marathiButton").className =
+            "btn btn-outline-success";
+
+    }
+
+}
+
+
+
+/* =====================================================
+   ENTER KEY
+===================================================== */
+
+document
+    .getElementById("userMessage")
+    .addEventListener("keydown", function(event) {
+
+        if (
+            event.key === "Enter" &&
+            !event.shiftKey
+        ) {
+
+            event.preventDefault();
+
+            sendMessage();
+
+        }
+
+    });
+
+
+
+/* =====================================================
+   SEND MESSAGE
+===================================================== */
+
+async function sendMessage() {
+
+
+    const input =
+        document.getElementById("userMessage");
+
+
+    const chatBox =
+        document.getElementById("chatBox");
+
+
+    const sendButton =
+        document.getElementById("sendButton");
+
+
+    const message =
+        input.value.trim();
+
+
+    if (message === "") {
+
+        return;
+
+    }
+
+
+
+    /* ================= USER MESSAGE ================= */
+
+    const userDiv =
+        document.createElement("div");
+
+    userDiv.className =
+        "message user-message";
+
+
+    userDiv.innerHTML =
+        "<strong>" +
+        text[selectedLanguage].you +
+        "</strong><br>" +
+        escapeHtml(message)
+        .replace(/\n/g, "<br>");
+
+
+    chatBox.appendChild(userDiv);
+
+
+    input.value = "";
+
+
+
+    /* ================= LOADING ================= */
+
+    const loadingDiv =
+        document.createElement("div");
+
+    loadingDiv.className =
+        "message bot-message loading";
+
+
+    loadingDiv.id =
+        "loadingMessage";
+
+
+    loadingDiv.innerHTML =
+        text[selectedLanguage].thinking;
+
+
+    chatBox.appendChild(loadingDiv);
+
+
+    chatBox.scrollTop =
+        chatBox.scrollHeight;
+
+
+    sendButton.disabled = true;
+
+
+
+    /* ================= SEND TO FLASK ================= */
+
+    try {
+
+
+        const response =
+            await fetch("/chat", {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body: JSON.stringify({
+
+                    message: message,
+
+                    language: selectedLanguage
+
+                })
+
+            });
+
+
+
+        const data =
+            await response.json();
+
+
+
+        /* Remove loading */
+
+        const loading =
+            document.getElementById(
+                "loadingMessage"
+            );
+
+
+        if (loading) {
+
+            loading.remove();
+
+        }
+
+
+
+        /* ================= AI RESPONSE ================= */
+
+        const botDiv =
+            document.createElement("div");
+
+        botDiv.className =
+            "message bot-message";
+
+
+        if (data.reply) {
+
+            botDiv.innerHTML =
+
+                "<strong>" +
+                text[selectedLanguage].ai +
+                "</strong><br>" +
+
+                escapeHtml(data.reply)
+                .replace(/\n/g, "<br>");
+
+        }
+
+        else {
+
+            botDiv.innerHTML =
+
+                "<strong>" +
+                text[selectedLanguage].ai +
+                "</strong><br>" +
+
+                text[selectedLanguage].noResponse;
+
+        }
+
+
+        chatBox.appendChild(botDiv);
+
+    }
+
+
+    catch (error) {
+
+
+        console.error(
+            "Chat Error:",
+            error
+        );
+
+
+        const loading =
+            document.getElementById(
+                "loadingMessage"
+            );
+
+
+        if (loading) {
+
+            loading.remove();
+
+        }
+
+
+        const errorDiv =
+            document.createElement("div");
+
+        errorDiv.className =
+            "message bot-message";
+
+
+        errorDiv.innerHTML =
+
+            "<strong>" +
+            text[selectedLanguage].ai +
+            "</strong><br>" +
+
+            text[selectedLanguage].error;
+
+
+        chatBox.appendChild(errorDiv);
+
+    }
+
+
+    sendButton.disabled = false;
+
+
+    chatBox.scrollTop =
+        chatBox.scrollHeight;
+
+}
+
+
+
+/* =====================================================
+   CLEAR CHAT
+===================================================== */
+
+function clearChat() {
+
+
+    const chatBox =
+        document.getElementById("chatBox");
+
+
+    const t =
+        text[selectedLanguage];
+
+
+    chatBox.innerHTML = `
+
+        <div class="message bot-message">
+
+            <strong>
+                ${t.welcomeName}
+            </strong>
+
+            <br>
+
+            <span>
+                ${t.welcome}
+            </span>
+
+        </div>
+
+    `;
+
+}
+
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement("div");
+
+    div.innerText = value;
+
+    return div.innerHTML;
+
+}
+
+
+
+/* =====================================================
+   BUTTON EVENTS
+===================================================== */
+
+document
+    .getElementById("englishButton")
+    .addEventListener("click", function() {
+
+        setLanguage("English");
+
+    });
+
+
+document
+    .getElementById("marathiButton")
+    .addEventListener("click", function() {
+
+        setLanguage("Marathi");
+
+    });
+
+
+document
+    .getElementById("sendButton")
+    .addEventListener("click", sendMessage);
+
+
+document
+    .getElementById("clearButton")
+    .addEventListener("click", clearChat);
+
+
+
+/* =====================================================
+   LOAD SAVED LANGUAGE
+===================================================== */
+
+setLanguage(selectedLanguage);
+
+
+</script>
+
+
+</body>
+
+</html>

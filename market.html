@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="farmingApp">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Market Prices - AI Smart Farming Assistant</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+    <!-- Project CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <style>
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            background:
+                linear-gradient(
+                    rgba(0, 80, 30, 0.45),
+                    rgba(0, 80, 30, 0.45)
+                ),
+                url("/static/images/farm.jpg");
+
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+
+            font-family: Arial, sans-serif;
+        }
+
+        /* Navbar */
+
+        .navbar {
+            background: linear-gradient(
+                90deg,
+                #d9f99d,
+                #fef08a
+            ) !important;
+
+            padding: 12px 25px;
+        }
+
+        .navbar-brand {
+            color: #14532d !important;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .nav-link {
+            color: #14532d !important;
+            font-weight: 600;
+        }
+
+        /* Main Container */
+
+        .market-container {
+            max-width: 1100px;
+            margin: 45px auto;
+            padding: 20px;
+        }
+
+        .market-card {
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .page-title {
+            text-align: center;
+            color: #166534;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        /* Language buttons */
+
+        .language-buttons {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .language-buttons button {
+            margin: 4px;
+        }
+
+        /* Form */
+
+        .form-label {
+            color: #166534;
+            font-weight: bold;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 11px;
+        }
+
+        .check-btn {
+            width: 100%;
+            padding: 12px;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+
+        /* Loading */
+
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 25px;
+            color: #166534;
+            font-weight: bold;
+        }
+
+        /* Error */
+
+        #errorMessage {
+            display: none;
+            margin-top: 20px;
+        }
+
+        /* Result */
+
+        #resultSection {
+            display: none;
+            margin-top: 35px;
+        }
+
+        .result-heading {
+            color: #166534;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table th {
+            background-color: #166534 !important;
+            color: white !important;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* Source */
+
+        .source-box {
+            margin-top: 25px;
+            padding: 18px;
+
+            background: #f0fdf4;
+
+            border-left: 5px solid #16a34a;
+
+            border-radius: 10px;
+        }
+
+        .source-box h5 {
+            color: #166534;
+            font-weight: bold;
+        }
+
+        /* Technology */
+
+        .technology-box {
+            margin-top: 25px;
+            padding: 20px;
+
+            background: #fefce8;
+
+            border-radius: 12px;
+        }
+
+        .technology-box h5 {
+            color: #166534;
+            font-weight: bold;
+        }
+
+        .technology-box li {
+            margin-bottom: 8px;
+        }
+
+        /* Contact */
+
+        .contact-section {
+            margin-top: 35px;
+            padding: 25px;
+
+            background: #f0fdf4;
+
+            border-radius: 15px;
+
+            text-align: center;
+        }
+
+        .contact-section h4 {
+            color: #166534;
+            font-weight: bold;
+        }
+
+        .contact-section p {
+            margin-bottom: 8px;
+        }
+
+        /* Footer */
+
+        /* ================= FOOTER ================= */
+
+.main-footer {
+    background: #238f5b;
+    color: white;
+    text-align: center;
+    padding: 22px 10px 25px;
+    margin-top: 40px;
+}
+
+.main-footer h4 {
+    margin: 0 0 10px;
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.main-footer p {
+    margin: 8px 0;
+    font-size: 16px;
+}
+
+.main-footer .copyright {
+    margin-top: 12px;
+    font-size: 16px;
+    font-weight: 500;
+}
+    </style>
+
+</head>
+
+
+<body ng-controller="DashboardController">
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar navbar-expand-lg">
+
+    <div class="container-fluid">
+
+        <!-- Logo / Brand -->
+
+        <a class="navbar-brand" href="/dashboard">
+            🌾 AI Smart Farming Assistant
+        </a>
+
+
+        <!-- Navigation -->
+
+        <div class="d-flex align-items-center">
+
+            <a href="/dashboard"
+               class="btn btn-outline-success me-2">
+
+                [[text[currentLanguage].dashboard]]
+
+            </a>
+
+            <a href="/profile"
+               class="btn btn-outline-success me-2">
+
+                [[text[currentLanguage].profile]]
+
+            </a>
+
+            <a href="/logout"
+               class="btn btn-outline-danger">
+
+                [[text[currentLanguage].logout]]
+
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<!-- ================= MAIN ================= -->
+
+<div class="market-container">
+
+    <div class="market-card">
+
+
+        <!-- Title -->
+
+        <h1 class="page-title">
+
+            [[currentLanguage == 'en'
+            ? '🌾 Market Prices'
+            : '🌾 बाजार भाव']]
+
+        </h1>
+
+
+        <p class="page-subtitle">
+
+            [[currentLanguage == 'en'
+            ? 'Check the latest available mandi prices for your crop.'
+            : 'तुमच्या पिकाचे उपलब्ध नवीनतम बाजार भाव तपासा.']]
+
+        </p>
+
+
+        <!-- Language Buttons -->
+
+        <div class="language-buttons">
+
+            <button
+                class="btn btn-success"
+                ng-click="changeLanguage('en')">
+
+                  English
+
+            </button>
+
+            <button
+              class="btn btn-outline-success"
+              ng-click="changeLanguage('mr')">
+
+               मराठी
+
+            </button>
+
+        </div>
+
+
+        <!-- ================= INPUT FORM ================= -->
+
+        <div class="row g-3">
+
+
+            <!-- Crop -->
+
+            <div class="col-md-4">
+
+                <label class="form-label">
+
+                    [[currentLanguage == 'en'
+                    ? '🌱 Crop'
+                    : '🌱 पीक']]
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="crop"
+                    class="form-control"
+                    placeholder="Example: Tomato">
+
+            </div>
+
+
+            <!-- State -->
+
+            <div class="col-md-4">
+
+                <label class="form-label">
+
+                    [[currentLanguage == 'en'
+                    ? '📍 State'
+                    : '📍 राज्य']]
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="state"
+                    class="form-control"
+                    placeholder="Example: Maharashtra">
+
+            </div>
+
+
+            <!-- District -->
+
+            <div class="col-md-4">
+
+                <label class="form-label">
+
+                    [[currentLanguage == 'en'
+                    ? '📍 District'
+                    : '📍 जिल्हा']]
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="district"
+                    class="form-control"
+                    placeholder="Example: Pune">
+
+            </div>
+
+
+            <!-- Button -->
+
+            <div class="col-md-12 mt-4">
+
+                <button
+                    class="btn btn-success check-btn"
+                    onclick="getMarketPrices()">
+
+                    🔍
+
+                    [[currentLanguage == 'en'
+                    ? 'Check Market Prices'
+                    : 'बाजार भाव तपासा']]
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= LOADING ================= -->
+
+        <div id="loading">
+
+            ⏳
+
+            [[currentLanguage == 'en'
+            ? 'Getting latest market prices...'
+            : 'नवीनतम बाजार भाव मिळवत आहे...']]
+
+        </div>
+
+
+        <!-- ================= ERROR ================= -->
+
+        <div
+            id="errorMessage"
+            class="alert alert-danger">
+
+        </div>
+
+
+        <!-- ================= RESULT ================= -->
+
+        <div id="resultSection">
+
+
+            <h4 class="result-heading">
+
+                📊
+
+                [[currentLanguage == 'en'
+                ? 'Market Price Results'
+                : 'बाजार भाव परिणाम']]
+
+            </h4>
+
+
+            <div class="table-responsive">
+
+                <table
+                    class="table table-bordered table-striped">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+
+                                [[currentLanguage == 'en'
+                                ? 'Market'
+                                : 'बाजार']]
+
+                            </th>
+
+
+                            <th>
+
+                                [[currentLanguage == 'en'
+                                ? 'Min Price'
+                                : 'किमान भाव']]
+
+                            </th>
+
+
+                            <th>
+
+                                [[currentLanguage == 'en'
+                                ? 'Max Price'
+                                : 'कमाल भाव']]
+
+                            </th>
+
+
+                            <th>
+
+                                [[currentLanguage == 'en'
+                                ? 'Modal Price'
+                                : 'मोडल भाव']]
+
+                            </th>
+
+
+                            <th>
+
+                                [[currentLanguage == 'en'
+                                ? 'Date'
+                                : 'तारीख']]
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="priceTableBody">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- ================= SOURCE ================= -->
+
+            <div class="source-box">
+
+                <h5>
+
+                    📌
+
+                    [[currentLanguage == 'en'
+                    ? 'Data Source'
+                    : 'डेटा स्रोत']]
+
+                </h5>
+
+
+                <p>
+
+                    [[currentLanguage == 'en'
+                    ? 'Market prices are based on the latest available mandi data from AGMARKNET / CEDA Agri Market Data.'
+                    : 'बाजार भाव AGMARKNET / CEDA Agri Market Data मधील उपलब्ध नवीनतम मंडी डेटावर आधारित आहेत.']]
+
+                </p>
+
+
+                <small>
+
+                    [[currentLanguage == 'en'
+                    ? 'Prices are shown in ₹ per quintal.'
+                    : 'भाव ₹ प्रति क्विंटलमध्ये दाखवले आहेत.']]
+
+                </small>
+
+            </div>
+
+
+            <!-- ================= TECHNOLOGY ================= -->
+
+            <div class="technology-box">
+
+                <h5>
+
+                    🛠️
+
+                    [[currentLanguage == 'en'
+                    ? 'Technology Used'
+                    : 'वापरलेले तंत्रज्ञान']]
+
+                </h5>
+
+
+                <ul>
+
+                    <li>
+
+                        [[currentLanguage == 'en'
+                        ? 'Frontend: HTML, CSS, Bootstrap, JavaScript, AngularJS'
+                        : 'फ्रंटएंड: HTML, CSS, Bootstrap, JavaScript, AngularJS']]
+
+                    </li>
+
+
+                    <li>
+
+                        [[currentLanguage == 'en'
+                        ? 'Backend: Python Flask'
+                        : 'बॅकएंड: Python Flask']]
+
+                    </li>
+
+
+                    <li>
+
+                        [[currentLanguage == 'en'
+                        ? 'Market Data: AGMARKNET / CEDA Agri Market Data API'
+                        : 'बाजार डेटा: AGMARKNET / CEDA Agri Market Data API']]
+
+                    </li>
+
+
+                    <li>
+
+                        [[currentLanguage == 'en'
+                        ? 'Database: Firebase Cloud Firestore'
+                        : 'डेटाबेस: Firebase Cloud Firestore']]
+
+                    </li>
+
+
+                    <li>
+
+                        [[currentLanguage == 'en'
+                        ? 'Development Tool: Visual Studio Code'
+                        : 'डेव्हलपमेंट टूल: Visual Studio Code']]
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+        </div>
+
+</div>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="main-footer">
+
+    <h4>
+        Contact Us
+    </h4>
+
+    <p>
+        📞 +91 98765 43210
+    </p>
+
+    <p class="copyright">
+        © 2026 AI Smart Farming Assistant | Smart Technology for Better Farming
+    </p>
+
+</footer>
+
+
+<!-- AngularJS App -->
+
+<script src="/static/js/app.js"></script>
+
+
+<!-- ================= MARKET JAVASCRIPT ================= -->
+
+<script>
+
+selectedLanguage =
+    localStorage.getItem("selectedLanguage") || "en";    
+
+    function getMarketPrices() {
+
+        const crop =
+            document.getElementById("crop").value.trim();
+
+
+        const state =
+            document.getElementById("state").value.trim();
+
+
+        const district =
+            document.getElementById("district").value.trim();
+
+
+        /* Validation */
+
+        if (!crop || !state || !district) {
+
+            const message =
+                selectedLanguage === "mr"
+                ? "कृपया पीक, राज्य आणि जिल्हा भरा."
+                : "Please enter crop, state and district.";
+
+
+            alert(message);
+
+            return;
+
+        }
+
+
+        /* Show Loading */
+
+        document.getElementById("loading")
+            .style.display = "block";
+
+
+        document.getElementById("resultSection")
+            .style.display = "none";
+
+
+        document.getElementById("errorMessage")
+            .style.display = "none";
+
+
+        /* API URL */
+
+        const url =
+            "/market_prices?" +
+            "crop=" +
+            encodeURIComponent(crop) +
+            "&state=" +
+            encodeURIComponent(state) +
+            "&district=" +
+            encodeURIComponent(district) +
+            "&language=" +
+            encodeURIComponent(selectedLanguage);
+
+
+        /* Fetch */
+
+        fetch(url)
+
+            .then(response => {
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Server Error: " +
+                        response.status
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+
+            .then(data => {
+
+                document.getElementById("loading")
+                    .style.display = "none";
+
+
+                /* Backend error */
+
+                if (data.error) {
+
+                    document.getElementById(
+                        "errorMessage"
+                    ).innerText = data.error;
+
+
+                    document.getElementById(
+                        "errorMessage"
+                    ).style.display = "block";
+
+
+                    return;
+
+                }
+
+
+                /* Clear old table */
+
+                const tableBody =
+                    document.getElementById(
+                        "priceTableBody"
+                    );
+
+
+                tableBody.innerHTML = "";
+
+
+                /* Add prices */
+
+                data.prices.forEach(item => {
+
+                    const row =
+                        document.createElement("tr");
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${item.market}
+                        </td>
+
+                        <td>
+                            ₹ ${item.min_price}
+                        </td>
+
+                        <td>
+                            ₹ ${item.max_price}
+                        </td>
+
+                        <td>
+                            ₹ ${item.modal_price}
+                        </td>
+
+                        <td>
+                            ${item.date}
+                        </td>
+
+                    `;
+
+
+                    tableBody.appendChild(row);
+
+                });
+
+
+                /* Show result */
+
+                document.getElementById(
+                    "resultSection"
+                ).style.display = "block";
+
+            })
+
+
+            .catch(error => {
+
+                console.error(
+                    "Market Price Error:",
+                    error
+                );
+
+
+                document.getElementById("loading")
+                    .style.display = "none";
+
+
+                document.getElementById(
+                    "errorMessage"
+                ).innerText =
+
+                    selectedLanguage === "mr"
+
+                    ? "बाजार भाव मिळवता आले नाहीत. कृपया पुन्हा प्रयत्न करा."
+
+                    : "Unable to get market prices. Please try again.";
+
+
+                document.getElementById(
+                    "errorMessage"
+                ).style.display = "block";
+
+            });
+
+    }
+
+</script>
+
+
+</body>
+
+</html>

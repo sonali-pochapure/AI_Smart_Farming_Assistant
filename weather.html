@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Weather Information - AI Smart Farming Assistant</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        body {
+            background-image: url("{{ url_for('static', filename='images/farm.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .weather-section {
+            padding: 45px 15px;
+        }
+
+        .weather-card {
+            max-width: 850px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .weather-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .weather-header h1 {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .language-buttons {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .language-buttons button {
+            min-width: 120px;
+            margin: 5px;
+        }
+
+        .search-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .search-area input {
+            height: 50px;
+        }
+
+        .search-button {
+            min-width: 120px;
+        }
+
+        .weather-result {
+            display: none;
+        }
+
+        .weather-main {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .weather-icon {
+            font-size: 65px;
+        }
+
+        .temperature {
+            font-size: 45px;
+            font-weight: bold;
+            color: #198754;
+        }
+
+        .city-name {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .weather-box {
+            background: #f1f8f4;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            height: 100%;
+        }
+
+        .weather-box h5 {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .weather-box p {
+            font-size: 20px;
+            margin: 5px 0;
+        }
+
+        .error-message {
+            display: none;
+            color: #dc3545;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        footer {
+            margin-top: 30px;
+            padding: 20px;
+            text-align: center;
+            background: rgba(25, 135, 84, 0.95);
+            color: white;
+        }
+        /* 7-Day Forecast */
+
+.forecast-section {
+    margin-top: 30px;
+}
+
+.forecast-title {
+    color: #198754;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.forecast-card {
+    background: #f1f8f4;
+    border-radius: 15px;
+    padding: 18px;
+    text-align: center;
+    height: 100%;
+    border: 1px solid #d8eee1;
+}
+
+.forecast-card h6 {
+    color: #198754;
+    font-weight: bold;
+}
+
+.forecast-icon {
+    font-size: 35px;
+    margin: 8px 0;
+}
+
+.forecast-temp {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.forecast-rain {
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+/* Farming Advice */
+
+.advice-section {
+    margin-top: 30px;
+}
+
+.advice-box {
+    background: #fff8dc;
+    border-left: 6px solid #ffc107;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.advice-box h5 {
+    color: #856404;
+    font-weight: bold;
+}
+
+.advice-box p {
+    margin: 0;
+    font-size: 17px;
+}
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar navbar-expand-lg">
+
+    <div class="container">
+
+        <a class="navbar-brand fw-bold text-success"
+           href="/dashboard">
+
+            <img src="https://png.pngtree.com/png-clipart/20240606/original/pngtree-farmer-logo-png-image_15258161.png"
+                 height="60"
+                 width="60"
+                 alt="Farmer Logo">
+
+            <span id="brandText">
+                AI Smart Farming Assistant
+            </span>
+
+        </a>
+
+
+        <a href="/dashboard"
+           class="btn btn-success"
+           id="dashboardButton">
+
+            Dashboard
+
+        </a>
+
+    </div>
+
+</nav>
+
+
+
+<!-- ================= WEATHER SECTION ================= -->
+
+<section class="weather-section">
+
+    <div class="weather-card">
+
+
+        <!-- HEADER -->
+
+        <div class="weather-header">
+
+            <h1 id="weatherTitle">
+                🌦️ Weather Information
+            </h1>
+
+            <p class="text-muted"
+               id="weatherSubtitle">
+
+                Check the latest weather information for your city.
+
+            </p>
+
+        </div>
+
+
+
+        <!-- LANGUAGE BUTTONS -->
+
+        <div class="language-buttons">
+
+            <button
+                type="button"
+                id="englishButton"
+                class="btn btn-success">
+
+                English
+
+            </button>
+
+
+            <button
+                type="button"
+                id="marathiButton"
+                class="btn btn-outline-success">
+
+                मराठी
+
+            </button>
+
+        </div>
+
+
+
+        <!-- SEARCH -->
+
+        <div class="search-area">
+
+            <input
+                type="text"
+                id="cityInput"
+                class="form-control"
+                placeholder="Enter city name">
+
+            <button
+                type="button"
+                id="searchButton"
+                class="btn btn-success search-button">
+
+                Search
+
+            </button>
+
+        </div>
+
+
+
+        <!-- ERROR -->
+
+        <div id="errorMessage"
+             class="error-message">
+
+        </div>
+
+
+
+        <!-- WEATHER RESULT -->
+
+        <div id="weatherResult"
+             class="weather-result">
+
+
+            <!-- MAIN WEATHER -->
+
+            <div class="weather-main">
+
+                <div class="weather-icon"
+                     id="weatherIcon">
+
+                    🌤️
+
+                </div>
+
+                <div class="city-name"
+                     id="cityName">
+
+                </div>
+
+                <div class="temperature"
+                     id="temperature">
+
+                </div>
+
+                <div id="condition">
+
+                </div>
+                <!-- ================= 7 DAY FORECAST ================= -->
+
+<div class="forecast-section">
+
+    <h4 class="forecast-title" id="forecastTitle">
+        📅 7-Day Weather Forecast
+    </h4>
+
+    <div class="row g-3" id="forecastContainer">
+
+    </div>
+
+</div>
+
+
+<!-- ================= FARMING ADVICE ================= -->
+
+<div class="advice-section">
+
+    <div class="advice-box">
+
+        <h5 id="adviceTitle">
+            🌾 Farming Advice
+        </h5>
+
+        <p id="farmingAdvice">
+            --
+        </p>
+
+    </div>
+
+</div>
+
+            </div>
+
+
+
+            <!-- WEATHER DETAILS -->
+
+            <div class="row g-3">
+
+
+                <div class="col-md-4">
+
+                    <div class="weather-box">
+
+                        <h5 id="humidityTitle">
+                            💧 Humidity
+                        </h5>
+
+                        <p id="humidity">
+                            --
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="col-md-4">
+
+                    <div class="weather-box">
+
+                        <h5 id="windTitle">
+                            💨 Wind Speed
+                        </h5>
+
+                        <p id="wind">
+                            --
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="col-md-4">
+
+                    <div class="weather-box">
+
+                        <h5 id="rainTitle">
+                            🌧️ Rain
+                        </h5>
+
+                        <p id="rain">
+                            --
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <h5 id="contactTitle">
+        Contact Us
+    </h5>
+
+    <p>
+        📞 +91 98765 43210
+    </p>
+
+    <p id="footerText">
+        © 2026 AI Smart Farming Assistant |
+        Smart Technology for Better Farming
+    </p>
+
+</footer>
+
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+
+/* =====================================================
+   LANGUAGE
+===================================================== */
+
+let selectedLanguage =
+    localStorage.getItem("weatherLanguage") || "English";
+
+
+const text = {
+
+    English: {
+
+        brand:
+            "AI Smart Farming Assistant",
+
+        dashboard:
+            "Dashboard",
+
+        title:
+            "🌦️ Weather Information",
+
+        forecast:
+            "📅 7-Day Weather Forecast",
+
+        advice:
+            "🌾 Farming Advice",
+
+        subtitle:
+            "Check the latest weather information for your city.",
+
+        cityPlaceholder:
+            "Enter city name",
+
+        search:
+            "Search",
+
+        humidity:
+            "💧 Humidity",
+
+        wind:
+            "💨 Wind Speed",
+
+        rain:
+            "🌧️ Rain",
+
+        contact:
+            "Contact Us",
+
+        footer:
+            "© 2026 AI Smart Farming Assistant | Smart Technology for Better Farming",
+
+        enterCity:
+            "Please enter a city name.",
+
+        unable:
+            "Unable to get weather information. Please try again.",
+
+        noRain:
+            "No rain currently",
+
+        raining:
+              "Rain currently"
+            
+
+    },
+
+
+    Marathi: {
+
+        brand:
+            "AI स्मार्ट फार्मिंग असिस्टंट",
+
+        dashboard:
+            "डॅशबोर्ड",
+
+        title:
+            "🌦️ हवामान माहिती",
+
+        forecast:
+           "📅 पुढील 7 दिवसांचे हवामान",
+
+        advice:
+           "🌾 शेतीसाठी सूचना",
+
+        subtitle:
+            "तुमच्या शहराची ताजी हवामान माहिती पहा.",
+
+        cityPlaceholder:
+            "शहराचे नाव लिहा",
+
+        search:
+            "शोधा",
+
+        humidity:
+            "💧 आर्द्रता",
+
+        wind:
+            "💨 वाऱ्याचा वेग",
+
+        rain:
+            "🌧️ पाऊस",
+
+        contact:
+            "आमच्याशी संपर्क साधा",
+
+        footer:
+            "© 2026 AI स्मार्ट फार्मिंग असिस्टंट | चांगल्या शेतीसाठी स्मार्ट तंत्रज्ञान",
+
+        enterCity:
+            "कृपया शहराचे नाव लिहा.",
+
+        unable:
+            "हवामानाची माहिती मिळू शकली नाही. कृपया पुन्हा प्रयत्न करा.",
+
+        noRain:
+            "पावसाची माहिती उपलब्ध नाही",
+
+        raining:
+            "पावसाची शक्यता"
+
+    }
+
+};
+
+
+
+/* =====================================================
+   CHANGE LANGUAGE
+===================================================== */
+
+function setLanguage(language) {
+
+    selectedLanguage = language;
+
+    localStorage.setItem(
+        "weatherLanguage",
+        language
+    );
+
+    const t = text[language];
+
+
+    document.getElementById("brandText").innerText =
+        t.brand;
+
+
+    document.getElementById("dashboardButton").innerText =
+        t.dashboard;
+
+
+    document.getElementById("weatherTitle").innerText =
+        t.title;
+
+
+    document.getElementById("weatherSubtitle").innerText =
+        t.subtitle;
+
+    document.getElementById("forecastTitle").innerText =
+        t.forecast;
+
+
+    document.getElementById("adviceTitle").innerText =
+         t.advice;
+
+
+    document.getElementById("cityInput").placeholder =
+        t.cityPlaceholder;
+
+    document.getElementById("searchButton").innerText =
+        t.search;
+
+
+    document.getElementById("humidityTitle").innerText =
+        t.humidity;
+
+
+    document.getElementById("windTitle").innerText =
+        t.wind;
+
+
+    document.getElementById("rainTitle").innerText =
+        t.rain;
+
+
+    document.getElementById("contactTitle").innerText =
+        t.contact;
+
+
+    document.getElementById("footerText").innerText =
+        t.footer;
+
+
+    if (language === "Marathi") {
+
+        document.getElementById("marathiButton").className =
+            "btn btn-success";
+
+        document.getElementById("englishButton").className =
+            "btn btn-outline-success";
+
+    }
+
+    else {
+
+        document.getElementById("englishButton").className =
+            "btn btn-success";
+
+        document.getElementById("marathiButton").className =
+            "btn btn-outline-success";
+
+    }
+
+}
+
+
+
+/* =====================================================
+   GET WEATHER
+===================================================== */
+
+async function getWeather() {
+
+
+    const city =
+        document.getElementById("cityInput")
+        .value
+        .trim();
+
+
+    const errorMessage =
+        document.getElementById("errorMessage");
+
+
+    const weatherResult =
+        document.getElementById("weatherResult");
+
+
+    if (city === "") {
+
+        errorMessage.innerText =
+            text[selectedLanguage].enterCity;
+
+        errorMessage.style.display =
+            "block";
+
+        weatherResult.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    errorMessage.style.display =
+        "none";
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "/weather_data?city=" +
+                 encodeURIComponent(city) +
+                 "&language=" +
+                 encodeURIComponent(selectedLanguage)
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok || data.error) {
+
+            errorMessage.innerText =
+                data.error ||
+                text[selectedLanguage].unable;
+
+            errorMessage.style.display =
+                "block";
+
+            weatherResult.style.display =
+                "none";
+
+            return;
+
+        }
+
+
+        /* City */
+
+        document.getElementById("cityName")
+            .innerText =
+            data.city;
+
+
+
+        /* Temperature */
+
+        document.getElementById("temperature")
+            .innerText =
+            Math.round(data.temperature) + "°C";
+
+
+
+        /* Condition */
+
+        document.getElementById("condition")
+            .innerText =
+            data.condition;
+
+
+
+        /* Humidity */
+
+        document.getElementById("humidity")
+            .innerText =
+            data.humidity + "%";
+
+
+
+          /* Wind */
+
+        document.getElementById("wind")
+          .innerText =
+          data.wind + " km/h";
+
+
+        /* Rain */
+
+        if (data.rain) {
+
+            document.getElementById("rain")
+                .innerText =
+                selectedLanguage === "Marathi"
+                    ? text.Marathi.raining
+                    : text.English.raining;
+
+        }
+
+        else {
+
+            document.getElementById("rain")
+                .innerText =
+                selectedLanguage === "Marathi"
+                    ? text.Marathi.noRain
+                    : text.English.noRain;
+
+        }
+
+
+
+        /* Weather icon */
+
+        document.getElementById("weatherIcon")
+            .innerText =
+            getWeatherIcon(data.condition);
+
+            /* ================= 7 DAY FORECAST ================= */
+
+const forecastContainer =
+    document.getElementById("forecastContainer");
+
+forecastContainer.innerHTML = "";
+
+
+if (data.forecast) {
+
+    data.forecast.forEach(function(day) {
+
+        const date =
+            new Date(day.date);
+
+        const dayName =
+            date.toLocaleDateString(
+                selectedLanguage === "Marathi"
+                    ? "mr-IN"
+                    : "en-IN",
+                {
+                    weekday: "short"
+                }
+            );
+
+
+        const icon =
+            getWeatherIcon(day.condition);
+
+
+        const forecastCard =
+            document.createElement("div");
+
+        forecastCard.className =
+            "col-md-4 col-lg";
+
+        forecastCard.innerHTML = `
+
+            <div class="forecast-card">
+
+                <h6>
+                    ${dayName}
+                </h6>
+
+                <small>
+                    ${day.date}
+                </small>
+
+                <div class="forecast-icon">
+                    ${icon}
+                </div>
+
+                <div>
+                    ${day.condition}
+                </div>
+
+                <div class="forecast-temp">
+                    ${Math.round(day.max_temp)}°C /
+                    ${Math.round(day.min_temp)}°C
+                </div>
+
+                <div class="forecast-rain">
+
+                    🌧️ ${
+                        selectedLanguage === "Marathi"
+                            ? "पावसाची शक्यता"
+                            : "Rain Chance"
+                    }
+
+                    : ${day.rain_probability}%
+
+                </div>
+
+            </div>
+
+        `;
+
+        forecastContainer.appendChild(
+            forecastCard
+        );
+
+    });
+
+}
+
+
+/* ================= FARMING ADVICE ================= */
+
+document.getElementById("farmingAdvice")
+    .innerText =
+    data.farming_advice;
+
+
+
+        weatherResult.style.display =
+            "block";
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "Weather Error:",
+            error
+        );
+
+
+        errorMessage.innerText =
+            text[selectedLanguage].unable;
+
+
+        errorMessage.style.display =
+            "block";
+
+
+        weatherResult.style.display =
+            "none";
+
+    }
+
+}
+
+
+
+/* =====================================================
+   WEATHER ICON
+===================================================== */
+
+function getWeatherIcon(condition) {
+
+    condition =
+        condition.toLowerCase();
+
+
+    if (condition.includes("rain")) {
+
+        return "🌧️";
+
+    }
+
+    if (condition.includes("cloud")) {
+
+        return "☁️";
+
+    }
+
+    if (condition.includes("thunder")) {
+
+        return "⛈️";
+
+    }
+
+    if (condition.includes("snow")) {
+
+        return "❄️";
+
+    }
+
+    if (condition.includes("clear")) {
+
+        return "☀️";
+
+    }
+
+    return "🌤️";
+
+}
+
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+document
+    .getElementById("englishButton")
+    .addEventListener(
+        "click",
+        function() {
+
+            setLanguage("English");
+
+        }
+    );
+
+
+document
+    .getElementById("marathiButton")
+    .addEventListener(
+        "click",
+        function() {
+
+            setLanguage("Marathi");
+
+        }
+    );
+
+
+document
+    .getElementById("searchButton")
+    .addEventListener(
+        "click",
+        getWeather
+    );
+
+
+document
+    .getElementById("cityInput")
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                getWeather();
+
+            }
+
+        }
+    );
+
+
+
+/* =====================================================
+   LOAD LANGUAGE
+===================================================== */
+
+setLanguage(selectedLanguage);
+
+
+</script>
+
+
+</body>
+
+</html>

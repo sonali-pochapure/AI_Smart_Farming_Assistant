@@ -1,0 +1,299 @@
+/* ================================
+   GENERAL
+================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    color: #333;
+    background: #f5f8f3;
+}
+
+
+/* ================================
+   NAVBAR
+================================ */
+
+.navbar {
+    min-height: 70px;
+    background: linear-gradient(90deg, #e8f5e9, #f1f8e9, #fffde7) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.navbar-brand {
+    color: #2e7d32 !important;
+    font-size: 22px;
+}
+
+.nav-link {
+    color: #355e3b !important;
+    font-weight: 500;
+    margin: 0 8px;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: #198754 !important;
+}
+
+
+/* ================================
+   DASHBOARD BACKGROUND
+================================ */
+
+.dashboard-background {
+    background-image:
+        linear-gradient(
+            rgba(255, 255, 255, 0.20),
+            rgba(0, 50, 20, 0.30)
+        ),
+        url("/static/images/farms.jpg");
+
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+    min-height: calc(100vh - 70px);
+    width: 100%;
+}
+
+
+/* ================================
+   WELCOME SECTION
+================================ */
+
+.welcome-section {
+    padding-top: 20px;
+    padding-bottom: 35px;
+}
+
+.welcome-section h1 {
+    font-size: 38px;
+    font-weight: bold;
+    color: #14532d;
+    text-shadow: 1px 1px 3px white;
+}
+
+.welcome-section p {
+    font-size: 18px;
+    color: #234d2c;
+    font-weight: 500;
+}
+
+.leaf-line {
+    font-size: 30px;
+    margin-top: 5px;
+}
+
+
+/* ================================
+   FEATURE CARDS
+================================ */
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 18px;
+    padding: 25px;
+    min-height: 220px;
+
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+
+    transition: transform 0.3s ease,
+                box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-7px);
+
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.20);
+}
+
+.feature-card h3 {
+    color: #198754;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    color: #555;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 18px;
+}
+
+
+/* ================================
+   FEATURE ICONS
+================================ */
+
+.feature-icon {
+    min-width: 55px;
+    height: 55px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #e8f5e9;
+    border-radius: 15px;
+
+    font-size: 30px;
+}
+
+.feature-icon.blue {
+    background: #e3f2fd;
+}
+
+.feature-icon.yellow {
+    background: #fff8e1;
+}
+
+.feature-icon.purple {
+    background: #f3e5f5;
+}
+
+
+/* ================================
+   BUTTONS
+================================ */
+
+.btn-success {
+    background-color: #198754;
+    border-color: #198754;
+    border-radius: 8px;
+    padding: 8px 15px;
+    font-weight: 500;
+}
+
+.btn-success:hover {
+    background-color: #146c43;
+    border-color: #146c43;
+}
+
+
+/* ================================
+   FARM STATUS
+================================ */
+
+.farm-status {
+    background: rgba(255, 255, 255, 0.95);
+
+    border-radius: 18px;
+
+    padding: 20px 25px;
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 20px;
+
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.farm-status div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    text-align: center;
+
+    padding: 10px;
+}
+
+.farm-status div:first-child {
+    font-size: 25px;
+}
+
+.farm-status span {
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.farm-status strong {
+    color: #198754;
+    font-size: 18px;
+    margin-top: 3px;
+}
+
+
+/* ================================
+   FOOTER
+================================ */
+
+/* ================================
+   FOOTER
+================================ */
+
+footer {
+    background: #14532d;
+    color: white;
+    text-align: center;
+    padding: 25px 15px;
+    font-size: 14px;
+}
+
+footer h5 {
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+footer p {
+    margin: 5px 0;
+}
+
+
+/* ================================
+   RESPONSIVE DESIGN
+================================ */
+
+@media (max-width: 992px) {
+
+    .navbar-nav {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .welcome-section h1 {
+        font-size: 32px;
+    }
+
+    .farm-status {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+@media (max-width: 576px) {
+
+    .navbar-brand {
+        font-size: 18px;
+    }
+
+    .welcome-section h1 {
+        font-size: 26px;
+    }
+
+    .welcome-section p {
+        font-size: 15px;
+    }
+
+    .feature-card {
+        padding: 20px;
+    }
+
+    .farm-status {
+        grid-template-columns: 1fr;
+    }
+}

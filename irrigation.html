@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Irrigation Advice - AI Smart Farming Assistant</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+
+    <style>
+
+        body {
+            background-image: url("{{ url_for('static', filename='images/farm.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .irrigation-section {
+            padding: 45px 15px;
+        }
+
+        .irrigation-card {
+            max-width: 850px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .irrigation-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .irrigation-header h1 {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .language-buttons {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .language-buttons button {
+            min-width: 120px;
+            margin: 5px;
+        }
+
+        .form-label {
+            font-weight: bold;
+            color: #198754;
+        }
+
+        .form-control,
+        .form-select {
+            height: 50px;
+            border-radius: 10px;
+        }
+
+        .get-advice-button {
+            width: 100%;
+            height: 50px;
+            font-size: 17px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .irrigation-result {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .result-header {
+            text-align: center;
+            color: #198754;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .advice-box {
+            background: #f1f8f4;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 6px solid #198754;
+        }
+
+        .advice-box h5 {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .advice-box p {
+            font-size: 17px;
+            margin: 5px 0;
+        }
+
+        .main-advice {
+            background: #fff8dc;
+            border-left: 6px solid #ffc107;
+        }
+
+        .main-advice h5 {
+            color: #856404;
+        }
+
+        .error-message {
+            display: none;
+            color: #dc3545;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        footer {
+            margin-top: 30px;
+            padding: 20px;
+            text-align: center;
+            background: rgba(25, 135, 84, 0.95);
+            color: white;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar navbar-expand-lg">
+
+    <div class="container">
+
+        <a class="navbar-brand fw-bold text-success"
+           href="/dashboard">
+
+            <img src="https://png.pngtree.com/png-clipart/20240606/original/pngtree-farmer-logo-png-image_15258161.png"
+                 height="60"
+                 width="60"
+                 alt="Farmer Logo">
+
+            <span id="brandText">
+                AI Smart Farming Assistant
+            </span>
+
+        </a>
+
+
+        <a href="/dashboard"
+           class="btn btn-success"
+           id="dashboardButton">
+
+            Dashboard
+
+        </a>
+
+    </div>
+
+</nav>
+
+
+
+<!-- ================= IRRIGATION SECTION ================= -->
+
+<section class="irrigation-section">
+
+    <div class="irrigation-card">
+
+
+        <!-- HEADER -->
+
+        <div class="irrigation-header">
+
+            <h1 id="irrigationTitle">
+                💧 Irrigation Advice
+            </h1>
+
+            <p class="text-muted"
+               id="irrigationSubtitle">
+
+                Get irrigation advice based on crop and weather conditions.
+
+            </p>
+
+        </div>
+
+
+
+        <!-- LANGUAGE BUTTONS -->
+
+        <div class="language-buttons">
+
+            <button
+                type="button"
+                id="englishButton"
+                class="btn btn-success">
+
+                English
+
+            </button>
+
+
+            <button
+                type="button"
+                id="marathiButton"
+                class="btn btn-outline-success">
+
+                मराठी
+
+            </button>
+
+        </div>
+
+
+
+        <!-- CROP -->
+
+        <div class="mb-3">
+
+            <label
+                for="crop"
+                class="form-label"
+                id="cropLabel">
+
+                🌱 Crop
+
+            </label>
+
+            <label class="form-label">Crop Name</label>
+
+             <input type="text" id="crop" class="form-control"
+              placeholder="Enter crop name">
+
+        </div>
+
+
+
+        <!-- GROWTH STAGE -->
+
+        <div class="mb-3">
+
+            <label
+                for="stage"
+                class="form-label"
+                id="stageLabel">
+
+                🌿 Growth Stage
+
+            </label>
+
+            <label class="form-label" id="stageLabel">Growth Stage</label>
+
+           <select id="stage" class="form-select">
+             <option value="">Select Growth Stage</option>
+             <option value="Initial">Initial / सुरुवातीची अवस्था</option>
+             <option value="Vegetative">Vegetative / वाढीची अवस्था</option>
+             <option value="Flowering">Flowering / फुलोरा अवस्था</option>
+             <option value="Maturity">Maturity / परिपक्व अवस्था</option>
+            </select>
+
+        </div>
+
+
+
+        <!-- SOIL -->
+
+        <div class="mb-3">
+
+            <label
+                for="soil"
+                class="form-label"
+                id="soilLabel">
+
+                🪨 Soil Type
+
+            </label>
+
+            <label class="form-label" id="soilLabel">Soil Type</label>
+
+              <select id="soil" class="form-select">
+                    <option value="">Select Soil Type</option>
+                    <option value="Black">Black Soil / काळी माती</option>
+                    <option value="Loamy">Loamy Soil / पोयट्याची माती</option>
+                    <option value="Sandy">Sandy Soil / वालुकामय माती</option>
+                </select>
+        </div>
+
+
+
+        <!-- CITY -->
+
+        <div class="mb-3">
+
+            <label
+                for="city"
+                class="form-label"
+                id="cityLabel">
+
+                📍 City
+
+            </label>
+
+            <input
+                type="text"
+                id="city"
+                class="form-control"
+                placeholder="Enter city name">
+
+        </div>
+
+
+
+        <!-- GET ADVICE BUTTON -->
+
+        <button
+            type="button"
+            id="adviceButton"
+            class="btn btn-success get-advice-button">
+
+            💧 Get Irrigation Advice
+
+        </button>
+
+
+
+        <!-- ERROR -->
+
+        <div
+            id="errorMessage"
+            class="error-message">
+
+        </div>
+
+
+
+        <!-- ================= RESULT ================= -->
+
+        <div
+            id="irrigationResult"
+            class="irrigation-result">
+
+
+            <h3
+                class="result-header"
+                id="resultTitle">
+
+                💧 Irrigation Recommendation
+
+            </h3>
+
+
+
+            <!-- WEATHER -->
+
+            <div class="advice-box">
+
+                <h5 id="weatherResultTitle">
+                    🌦️ Weather Condition
+                </h5>
+
+                <p id="weatherCondition">
+                    --
+                </p>
+
+            </div>
+
+
+
+            <!-- WHEN -->
+
+            <div class="advice-box">
+
+                <h5 id="whenTitle">
+                    🕐 When to Irrigate
+                </h5>
+
+                <p id="whenAdvice">
+                    --
+                </p>
+
+            </div>
+
+
+
+            <!-- AMOUNT -->
+
+            <div class="advice-box">
+
+                <h5 id="amountTitle">
+                    💧 How Much Water
+                </h5>
+
+                <p id="amountAdvice">
+                    --
+                </p>
+
+            </div>
+            <div class="result-box">
+              <h5 id="reasonTitle">Reason</h5>
+              <p id="reason"></p>
+            </div>
+
+
+
+            <!-- MAIN ADVICE -->
+
+            <div class="advice-box main-advice">
+
+                <h5 id="mainAdviceTitle">
+                    🌾 Farming Advice
+                </h5>
+
+                <p id="mainAdvice">
+                    --
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <h5 id="contactTitle">
+        Contact Us
+    </h5>
+
+    <p>
+        📞 +91 98765 43210
+    </p>
+
+    <p id="footerText">
+        © 2026 AI Smart Farming Assistant |
+        Smart Technology for Better Farming
+    </p>
+
+</footer>
+
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+
+/* =====================================================
+   LANGUAGE
+===================================================== */
+
+let selectedLanguage =
+    localStorage.getItem("irrigationLanguage") || "English";
+
+
+const text = {
+
+    English: {
+
+        brand:
+            "AI Smart Farming Assistant",
+
+        dashboard:
+            "Dashboard",
+
+        title:
+            "💧 Irrigation Advice",
+
+        subtitle:
+            "Get irrigation advice based on crop and weather conditions.",
+
+        crop:
+            "🌱 Crop",
+
+        stage:
+            "🌿 Growth Stage",
+
+        soil:
+            "🪨 Soil Type",
+
+        city:
+            "📍 City",
+
+        cityPlaceholder:
+            "Enter city name",
+
+        adviceButton:
+            "💧 Get Irrigation Advice",
+
+        result:
+            "💧 Irrigation Recommendation",
+
+        weather:
+            "🌦️ Weather Condition",
+
+        when:
+            "🕐 When to Irrigate",
+
+        amount:
+            "💧 How Much Water",
+
+        advice:
+            "🌾 Farming Advice",
+
+        contact:
+            "Contact Us",
+
+        footer:
+            "© 2026 AI Smart Farming Assistant | Smart Technology for Better Farming",
+
+        selectCrop:
+            "Select Crop",
+
+        selectStage:
+            "Select Growth Stage",
+
+        selectSoil:
+            "Select Soil Type",
+
+        enterCity:
+            "Please enter city name.",
+
+        fillDetails:
+            "Please select crop, growth stage, soil type and enter city.",
+
+        unable:
+            "Unable to get irrigation advice. Please try again."
+
+    },
+
+
+    Marathi: {
+
+        brand:
+            "AI स्मार्ट फार्मिंग असिस्टंट",
+
+        dashboard:
+            "डॅशबोर्ड",
+
+        title:
+            "💧 सिंचन सल्ला",
+
+        subtitle:
+            "पीक आणि हवामानानुसार पाणी कधी व किती द्यावे हे सुचवेल.",
+
+        crop:
+            "🌱 पीक",
+
+        stage:
+            "🌿 पिकाची अवस्था",
+
+        soil:
+            "🪨 मातीचा प्रकार",
+
+        city:
+            "📍 शहर",
+
+        cityPlaceholder:
+            "शहराचे नाव लिहा",
+
+        adviceButton:
+            "💧 सिंचन सल्ला मिळवा",
+
+        result:
+            "💧 सिंचन शिफारस",
+
+        weather:
+            "🌦️ हवामानाची स्थिती",
+
+        when:
+            "🕐 पाणी कधी द्यावे",
+
+        amount:
+            "💧 किती पाणी द्यावे",
+
+        advice:
+            "🌾 शेतीसाठी सूचना",
+
+        contact:
+            "आमच्याशी संपर्क साधा",
+
+        footer:
+            "© 2026 AI स्मार्ट फार्मिंग असिस्टंट | चांगल्या शेतीसाठी स्मार्ट तंत्रज्ञान",
+
+        selectCrop:
+            "पीक निवडा",
+
+        selectStage:
+            "पिकाची अवस्था निवडा",
+
+        selectSoil:
+            "मातीचा प्रकार निवडा",
+
+        enterCity:
+            "कृपया शहराचे नाव लिहा.",
+
+        fillDetails:
+            "कृपया पीक, पिकाची अवस्था, मातीचा प्रकार निवडा आणि शहराचे नाव लिहा.",
+
+        unable:
+            "सिंचन सल्ला मिळू शकला नाही. कृपया पुन्हा प्रयत्न करा."
+
+    }
+
+};
+
+
+
+/* =====================================================
+   CHANGE LANGUAGE
+===================================================== */
+
+function setLanguage(language) {
+
+    selectedLanguage = language;
+
+    localStorage.setItem(
+        "irrigationLanguage",
+        language
+    );
+
+    const t = text[language];
+
+
+    document.getElementById("brandText").innerText =
+        t.brand;
+
+
+    document.getElementById("dashboardButton").innerText =
+        t.dashboard;
+
+
+    document.getElementById("irrigationTitle").innerText =
+        t.title;
+
+
+    document.getElementById("irrigationSubtitle").innerText =
+        t.subtitle;
+
+
+    document.getElementById("cropLabel").innerText =
+        t.crop;
+
+
+    document.getElementById("stageLabel").innerText =
+        t.stage;
+
+
+    document.getElementById("soilLabel").innerText =
+        t.soil;
+
+
+    document.getElementById("cityLabel").innerText =
+        t.city;
+
+
+    document.getElementById("city").placeholder =
+        t.cityPlaceholder;
+
+
+    document.getElementById("adviceButton").innerText =
+        t.adviceButton;
+
+
+    document.getElementById("resultTitle").innerText =
+        t.result;
+
+
+    document.getElementById("weatherResultTitle").innerText =
+        t.weather;
+
+
+    document.getElementById("whenTitle").innerText =
+        t.when;
+
+
+    document.getElementById("amountTitle").innerText =
+        t.amount;
+        
+
+
+    document.getElementById("mainAdviceTitle").innerText =
+        t.advice;
+
+
+    document.getElementById("contactTitle").innerText =
+        t.contact;
+
+
+    document.getElementById("footerText").innerText =
+        t.footer;
+
+
+    document.querySelector("#crop option[value='']")
+        .innerText = t.selectCrop;
+
+
+    document.querySelector("#stage option[value='']")
+        .innerText = t.selectStage;
+
+
+    document.querySelector("#soil option[value='']")
+        .innerText = t.selectSoil;
+
+
+    if (language === "Marathi") {
+
+        document.getElementById("marathiButton").className =
+            "btn btn-success";
+
+        document.getElementById("englishButton").className =
+            "btn btn-outline-success";
+
+    }
+
+    else {
+
+        document.getElementById("englishButton").className =
+            "btn btn-success";
+
+        document.getElementById("marathiButton").className =
+            "btn btn-outline-success";
+
+    }
+
+}
+
+
+
+/* =====================================================
+   GET IRRIGATION ADVICE
+===================================================== */
+
+async function getIrrigationAdvice() {
+
+
+    const crop =
+        document.getElementById("crop").value;
+
+
+    const stage =
+        document.getElementById("stage").value;
+
+
+    const soil =
+        document.getElementById("soil").value;
+
+
+    const city =
+        document.getElementById("city")
+        .value
+        .trim();
+
+
+    const errorMessage =
+        document.getElementById("errorMessage");
+
+
+    const irrigationResult =
+        document.getElementById("irrigationResult");
+
+
+    if (
+        crop === "" ||
+        stage === "" ||
+        soil === "" ||
+        city === ""
+    ) {
+
+        errorMessage.innerText =
+            text[selectedLanguage].fillDetails;
+
+        errorMessage.style.display =
+            "block";
+
+        irrigationResult.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    errorMessage.style.display =
+        "none";
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "/irrigation_advice?crop=" +
+                encodeURIComponent(crop) +
+                "&stage=" +
+                encodeURIComponent(stage) +
+                "&soil=" +
+                encodeURIComponent(soil) +
+                "&city=" +
+                encodeURIComponent(city) +
+                "&language=" +
+                encodeURIComponent(selectedLanguage)
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok || data.error) {
+
+            errorMessage.innerText =
+                data.error ||
+                text[selectedLanguage].unable;
+
+            errorMessage.style.display =
+                "block";
+
+            irrigationResult.style.display =
+                "none";
+
+            return;
+
+        }
+
+
+        /* Weather */
+
+        document.getElementById("weatherCondition")
+            .innerText =
+            data.weather;
+
+
+        /* When */
+
+        document.getElementById("whenAdvice")
+            .innerText =
+            data.when;
+
+
+        /* Amount */
+
+        document.getElementById("amountAdvice")
+            .innerText =
+            data.amount;
+
+        document.getElementById("reason").innerText = data.reason;
+
+
+        /* Main Advice */
+
+        document.getElementById("mainAdvice")
+            .innerText =
+            data.advice;
+
+
+        irrigationResult.style.display =
+            "block";
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "Irrigation Error:",
+            error
+        );
+
+
+        errorMessage.innerText =
+            text[selectedLanguage].unable;
+
+
+        errorMessage.style.display =
+            "block";
+
+
+        irrigationResult.style.display =
+            "none";
+
+    }
+
+}
+
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+document
+    .getElementById("englishButton")
+    .addEventListener(
+        "click",
+        function() {
+
+            setLanguage("English");
+
+        }
+    );
+
+
+document
+    .getElementById("marathiButton")
+    .addEventListener(
+        "click",
+        function() {
+
+            setLanguage("Marathi");
+
+        }
+    );
+
+
+document
+    .getElementById("adviceButton")
+    .addEventListener(
+        "click",
+        getIrrigationAdvice
+    );
+
+
+
+/* =====================================================
+   LOAD LANGUAGE
+===================================================== */
+
+setLanguage(selectedLanguage);
+
+
+</script>
+
+
+</body>
+
+</html>
